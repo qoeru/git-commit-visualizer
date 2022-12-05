@@ -17,7 +17,7 @@ def get_content(file_name):
   f = open(file_name, "r")
   content = f.read()
   f.close()
-  return content.strip()
+  return content
 
 def get_refs(name):
   folder = os.path.join('.git', os.path.join('refs', name))
@@ -31,19 +31,19 @@ def get_refs(name):
 def create_graph(file_name):
   graph = graphviz.Digraph(file_name, format='dot')
 
-  # Branches
+  # ветки
   for branch, sha in get_refs("heads"):
     graph.node(branch, branch)
     graph.node(sha, sha)
     graph.edge(branch, sha)
 
-  # Tags
+  # теги
   for tag, sha in get_refs("tags"):
     graph.node(tag, tag)
     graph.node(sha, sha)
     graph.edge(tag, sha)
 
-  # HEAD
+  # голова
   graph.node('HEAD',"HEAD")
   head = get_content(os.path.join('.git', 'HEAD'))
   if head[:5] == 'ref: ':
@@ -53,9 +53,9 @@ def create_graph(file_name):
     graph.node('HEAD', cut_sha(head))
 
 
-  # Commits
+  # коммиты
   for full_sha, title, parents in zip(
-      git_log('%H').split(), #heximal, отвечает за номер коммита
+      git_log('%H').split(), #hex, отвечает за номер коммита
       git_log('%s').split('\n'), #string, отвечает за название комиита
       git_log('%P').split('\n')): #коммиты-родители
     sha = cut_sha(full_sha)
