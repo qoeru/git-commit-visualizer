@@ -17,7 +17,7 @@ def get_content(file_name):
   f = open(file_name, "r")
   content = f.read()
   f.close()
-  return content
+  return content.strip()
 
 def get_refs(name):
   folder = os.path.join('.git', os.path.join('refs', name))
@@ -33,24 +33,19 @@ def create_graph(file_name):
 
   # ветки
   for branch, sha in get_refs("heads"):
-    graph.node(branch, branch)
-    graph.node(sha, sha)
     graph.edge(branch, sha)
 
   # теги
   for tag, sha in get_refs("tags"):
-    graph.node(tag, tag)
-    graph.node(sha, sha)
     graph.edge(tag, sha)
 
   # голова
-  graph.node('HEAD',"HEAD")
   head = get_content(os.path.join('.git', 'HEAD'))
   if head[:5] == 'ref: ':
     # 'ref: refs/heads/<current_branch>'
     graph.edge('HEAD', head[16:])
   else:
-    graph.node('HEAD', cut_sha(head))
+    graph.edge('HEAD', cut_sha(head))
 
 
   # коммиты
@@ -68,6 +63,9 @@ def create_graph(file_name):
 
 def main():
   args = sys.argv[1:]
+  for branch, sha in get_refs("heads"):
+    print(branch)
+    print(sha)
   create_graph(args[0])
 
 if __name__ == "__main__":
